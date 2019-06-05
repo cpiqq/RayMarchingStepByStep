@@ -1,0 +1,9 @@
+RayMarchStepByStep/.idea
+RayMarchStepByStep/Library
+RayMarchStepByStep/Temp
+RayMarchStepByStep/Logs
+RayMarchStepByStep/Assets/Plugins/Editor/JetBrains
+Assembly-CSharp.csproj
+RayMarchStepByStep.sln
+JetBrains.meta
+RayMarchStepByStep/obj/Debug
