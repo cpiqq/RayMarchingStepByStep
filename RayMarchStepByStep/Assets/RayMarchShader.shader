@@ -20,9 +20,13 @@
             #include "UnityCG.cginc"
             
             sampler2D _MainTex;
-            uniform float4 _CamWorldSpace;
+            
             uniform float4x4 _CamFrustum, _CamToWorld;
-
+            uniform float _MaxDistance;
+            uniform float4 _Sphere1;
+            
+            
+            
             struct appdata
             {
                 float4 vertex : POSITION;
@@ -52,15 +56,55 @@
                 
                 return o;
             }
+            
+            float sdSphere(float3 p, float s){
+                return length(p) - s;
+            }
+            
+            float distancefield(float3 p){
+                float s1 = sdSphere( p - _Sphere1.xyz, _Sphere1.w);
+                return s1;
+            }
 
+
+            fixed4 raymarching(float3 rayOrigion, float3 rayDirection){
+                fixed4 result = fixed4(1,1,1,1);
+                const int max_iteration = 64;
+                float t = 0;//distance travelled along the ray direction
+                
+                for(int i = 0; i < max_iteration; i++){
+                    if(t > _MaxDistance){
+                        //environment
+                        result = fixed4(rayDirection, 1);
+                        break;
+                    }
+                    
+                    float3 p  = rayOrigion + rayDirection * t;
+                    //check for hit in distancefield
+                    float d = distancefield(p);
+                    if(d < 0.01){ //we have hit something!
+                        //shading
+                        result = fixed4(1,1,1,1);
+                        break;                        
+                    }
+                    t += d;
+                    
+                    
+                }
+                 
+                
+                return result;
+            }
 
 
             fixed4 frag (v2f i) : SV_Target
             {
                 float3 rayDirection = normalize(i.ray.xyz);
-                float3 rayOrigion = _CamWorldSpace;
+                float3 rayOrigion = _WorldSpaceCameraPos;
                 
-                return fixed4(rayDirection, 1);
+                fixed4 result = raymarching(rayOrigion, rayDirection);
+                
+                return result;
             }
             ENDCG
         }

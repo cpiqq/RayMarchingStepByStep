@@ -11,6 +11,9 @@ public class RayMarchCamera : MonoBehaviour
     [SerializeField]
     private Shader _shader;
 
+    public float maxDistance;
+    public Vector4 sphere1;
+
     private Material _rayMarchMat;
 
     public Material rayMarchMat
@@ -52,8 +55,8 @@ public class RayMarchCamera : MonoBehaviour
         
         rayMarchMat.SetMatrix("_CamFrustum", this.CamFrustum(this.camera));
         rayMarchMat.SetMatrix("_CamToWorld", this.camera.cameraToWorldMatrix );
-        rayMarchMat.SetVector("_CamWorldSpace", this.camera.transform.position);
- 
+        rayMarchMat.SetFloat("_MaxDistance", maxDistance);
+        rayMarchMat.SetVector("_Sphere1", sphere1);
 
 
         RenderTexture.active = dest;
