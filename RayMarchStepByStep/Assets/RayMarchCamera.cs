@@ -14,6 +14,8 @@ public class RayMarchCamera : MonoBehaviour
     public float maxDistance;
     public Vector4 sphere1;
 
+    public Transform directLight;
+
     private Material _rayMarchMat;
 
     public Material rayMarchMat
@@ -53,6 +55,7 @@ public class RayMarchCamera : MonoBehaviour
             return;
         }
         
+        rayMarchMat.SetVector("_LightDir", this.directLight ? directLight.forward : Vector3.down);
         rayMarchMat.SetMatrix("_CamFrustum", this.CamFrustum(this.camera));
         rayMarchMat.SetMatrix("_CamToWorld", this.camera.cameraToWorldMatrix );
         rayMarchMat.SetFloat("_MaxDistance", maxDistance);
