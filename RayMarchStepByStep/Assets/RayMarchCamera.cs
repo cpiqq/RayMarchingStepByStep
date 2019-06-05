@@ -6,7 +6,7 @@ using UnityEngine;
 
 [RequireComponent(typeof(Camera))]
 [ExecuteInEditMode]
-public class RayMarchCamera : MonoBehaviour
+public class RayMarchCamera : SceneViewFilter
 {
     [SerializeField]
     private Shader _shader;
@@ -63,6 +63,7 @@ public class RayMarchCamera : MonoBehaviour
 
 
         RenderTexture.active = dest;
+        rayMarchMat.SetTexture("_MainTex", src);
         GL.PushMatrix();
         GL.LoadOrtho();
         rayMarchMat.SetPass(0);

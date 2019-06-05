@@ -25,7 +25,7 @@
             uniform float _MaxDistance;
             uniform float4 _Sphere1;
             uniform float4 _LightDir;
-            
+            uniform sampler2D _CameraDepthTexture;
             
             struct appdata
             {
@@ -76,15 +76,15 @@
                 return normalize(n);
             }
 
-            fixed4 raymarching(float3 rayOrigion, float3 rayDirection){
+            fixed4 raymarching(float3 rayOrigion, float3 rayDirection, float depth){
                 fixed4 result = fixed4(1,1,1,1);
                 const int max_iteration = 164;
                 float t = 0;//distance travelled along the ray direction
                 
                 for(int i = 0; i < max_iteration; i++){
-                    if(t > _MaxDistance){
+                    if(t > _MaxDistance || t >= depth ){
                         //environment
-                        result = fixed4(rayDirection, 1);
+                        result = fixed4(rayDirection, 0);
                         break;
                     }
                     
@@ -99,7 +99,7 @@
 
 
                         //shading
-                        result = fixed4(1,1,1,1) * light;
+                        result = fixed4(fixed3(1,1,1) * light, 1) ;
                         
                         break;                        
                     }
@@ -115,12 +115,17 @@
 
             fixed4 frag (v2f i) : SV_Target
             {
+                float depth = LinearEyeDepth(tex2D(_CameraDepthTexture, i.uv).r);
+                depth *= length(i.ray);
+                
+                fixed3 col = tex2D(_MainTex, i.uv);
+            
                 float3 rayDirection = normalize(i.ray.xyz);
                 float3 rayOrigion = _WorldSpaceCameraPos;
                 
-                fixed4 result = raymarching(rayOrigion, rayDirection);
+                fixed4 result = raymarching(rayOrigion, rayDirection, depth);
                 
-                return result;
+                return fixed4(col * (1.0 - result.w) + result.xyz * result.w, 1.0);
             }
             ENDCG
         }
