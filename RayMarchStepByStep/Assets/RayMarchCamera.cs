@@ -12,7 +12,9 @@ public class RayMarchCamera : SceneViewFilter
     private Shader _shader;
 
     public float maxDistance;
-    public Vector4 sphere1;
+    public Color mainColor;
+    public Vector4 sphere1, box1;
+    public Vector3 modInterval;
 
     public Transform directLight;
 
@@ -59,8 +61,10 @@ public class RayMarchCamera : SceneViewFilter
         rayMarchMat.SetMatrix("_CamFrustum", this.CamFrustum(this.camera));
         rayMarchMat.SetMatrix("_CamToWorld", this.camera.cameraToWorldMatrix );
         rayMarchMat.SetFloat("_MaxDistance", maxDistance);
-        rayMarchMat.SetVector("_Sphere1", sphere1);
-
+        rayMarchMat.SetVector("_Sphere1", sphere1);    
+        rayMarchMat.SetColor("_MainColor", mainColor);
+        rayMarchMat.SetVector("_Box1", box1);
+        rayMarchMat.SetVector("_ModInterval", modInterval);
 
         RenderTexture.active = dest;
         rayMarchMat.SetTexture("_MainTex", src);

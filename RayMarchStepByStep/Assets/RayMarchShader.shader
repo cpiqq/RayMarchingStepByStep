@@ -18,14 +18,17 @@
             #pragma target 3.0
 
             #include "UnityCG.cginc"
+            #include "DistanceFunctions.cginc"
             
             sampler2D _MainTex;
             
             uniform float4x4 _CamFrustum, _CamToWorld;
             uniform float _MaxDistance;
-            uniform float4 _Sphere1;
+            uniform float4 _Sphere1, _Box1;
             uniform float4 _LightDir;
             uniform sampler2D _CameraDepthTexture;
+            uniform fixed4 _MainColor;
+            uniform float3 _ModInterval;
             
             struct appdata
             {
@@ -57,13 +60,17 @@
                 return o;
             }
             
-            float sdSphere(float3 p, float s){
-                return length(p) - s;
-            }
             
             float distancefield(float3 p){
+                float modX = pMod1(p.x, _ModInterval.x);
+                float modY = pMod1(p.y, _ModInterval.y);
+//                float modZ = pMod1(p.z, _ModInterval.z);
+
                 float s1 = sdSphere( p - _Sphere1.xyz, _Sphere1.w);
-                return s1;
+                float b1 = sdBox(p - _Box1.xyz, _Box1.www);
+                
+                
+                return opS( s1, b1);
             }
 
             float3 getNormal(float3 p){
@@ -99,7 +106,7 @@
 
 
                         //shading
-                        result = fixed4(fixed3(1,1,1) * light, 1) ;
+                        result = fixed4(_MainColor.rgb * light, 1) ;
                         
                         break;                        
                     }
